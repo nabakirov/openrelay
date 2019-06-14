@@ -23,17 +23,6 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
-  ethnode:
-    build:
-      context: ./
-      dockerfile: Dockerfile.testrpc
-    ports:
-      - "18545:8545"
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-    # command: ["testrpc", "--networkId", "50", "--debug", "-p", "8545", "--db", "/testrpcdb", "-m", "concert load couple harbor equip island argue ramp clarify fence smart topic"]
   ingest:
     build:
       context: ./
@@ -41,7 +30,7 @@ services:
     image: "openrelay/ingest:${TAG:-latest}"
     ports:
       - "8081:8080"
-    command: ["/ingest", "postgres://ingest${POSTGRES_HOST:-postgres}", "env://POSTGRES_PASSWORD", "${REDIS_HOST:-redis:6379}", "C22d5b2951DB72B44CFb8089bb8CD374A3c354eA", "queue://ingest"]
+    command: ["/ingest", "postgres://ingest${POSTGRES_HOST:-postgres}", "env://POSTGRES_PASSWORD", "${REDIS_HOST:-redis:6379}", "${RELAY_ADDRESS}", "queue://ingest"]
     depends_on:
       - redis
       - corebuild
@@ -76,7 +65,6 @@ services:
       - bloomdata:/bloom/data
     depends_on:
       - redis
-      - ethnode
       - corebuild
     deploy:
       replicas: 1
@@ -90,7 +78,6 @@ services:
     command: ["/fundcheckrelay", "${REDIS_HOST:-redis:6379}", "${ETHEREUM_NODE:-http://ethnode:8545}", "queue://fundcheck=>queue://poolfilter", "--invalidation=topic://newblocks"]
     depends_on:
       - redis
-      - ethnode
       - corebuild
     deploy:
       replicas: 1
@@ -102,12 +89,11 @@ services:
       context: ./
       dockerfile: Dockerfile.fillmonitorng
     image: "openrelay/fillmonitorng:${TAG:-latest}"
-    command: ["/fillmonitor", "${REDIS_HOST:-redis:6379}", "${ETHEREUM_NODE:-http://ethnode:8545}", "queue://fillblocks", "queue://ordersfilled", "file:///bloom/data/testdata", "0x48bacb9266a570d521063ef5dd96e61686dbe788"]
+    command: ["/fillmonitor", "${REDIS_HOST:-redis:6379}", "${ETHEREUM_NODE:-http://ethnode:8545}", "queue://fillblocks", "queue://ordersfilled", "file:///bloom/data/testdata", "${RELAY_ADDRESS}"]
     volumes:
       - bloomdata:/bloom/data
     depends_on:
       - redis
-      - ethnode
       - corebuild
     restart: on-failure
     deploy:
@@ -119,10 +105,9 @@ services:
       context: ./
       dockerfile: Dockerfile.multisigmonitor
     image: "openrelay/multisigmonitor:${TAG:-latest}"
-    command: ["/multisigmonitor", "${REDIS_HOST:-redis:6379}", "${ETHEREUM_NODE:-http://ethnode:8545}", "queue://multisigblocks", "0x48bacb9266a570d521063ef5dd96e61686dbe788"]
+    command: ["/multisigmonitor", "${REDIS_HOST:-redis:6379}", "${ETHEREUM_NODE:-http://ethnode:8545}", "queue://multisigblocks", "${RELAY_ADDRESS}"]
     depends_on:
       - redis
-      - ethnode
       - corebuild
     restart: on-failure
     deploy:
@@ -134,10 +119,9 @@ services:
       context: ./
       dockerfile: Dockerfile.affiliatemonitor
     image: "openrelay/affiliatemonitor:${TAG:-latest}"
-    command: ["/affiliatemonitor", "${REDIS_HOST:-redis:6379}", "${ETHEREUM_NODE:-http://ethnode:8545}", "queue://affiliateblocks", "0x4112f5fc3f737e813ca8cc1a48d1da3dc8719435"]
+    command: ["/affiliatemonitor", "${REDIS_HOST:-redis:6379}", "${ETHEREUM_NODE:-http://ethnode:8545}", "queue://affiliateblocks", "${RELAY_ADDRESS}"]
     depends_on:
       - redis
-      - ethnode
     restart: on-failure
     deploy:
       replicas: 1
@@ -163,7 +147,7 @@ services:
       context: ./
       dockerfile: Dockerfile.initialize
     image: "openrelay/initialize:${TAG:-latest}"
-    command: ["/initialize", "${REDIS_HOST:-redis:6379}", "${ZRX_FEE:-500000000000000000}", "${RELAY_ADDRESS:-C22d5b2951DB72B44CFb8089bb8CD374A3c354eA}"]
+    command: ["/initialize", "${REDIS_HOST:-redis:6379}", "${ZRX_FEE:-500000000000000000}", "${RELAY_ADDRESS}"]
     depends_on:
       - redis
       - corebuild
@@ -295,7 +279,6 @@ services:
       ETHEREUM_URL: "${ETHEREUM_NODE:-http://ethnode:8545}"
     depends_on:
       - redis
-      - ethnode
       - corebuild
     restart: on-failure
     deploy:
@@ -307,10 +290,9 @@ services:
       context: ./
       dockerfile: Dockerfile.allowancemonitor
     image: "openrelay/allowancemonitor:${TAG:-latest}"
-    command: ["/allowancemonitor", "${REDIS_HOST:-redis:6379}", "${ETHEREUM_NODE:-http://ethnode:8545}", "queue://allowanceblocks", "queue://recordspend", "0x48bacb9266a570d521063ef5dd96e61686dbe788"]
+    command: ["/allowancemonitor", "${REDIS_HOST:-redis:6379}", "${ETHEREUM_NODE:-http://ethnode:8545}", "queue://allowanceblocks", "queue://recordspend", "${RELAY_ADDRESS}"]
     depends_on:
       - redis
-      - ethnode
       - corebuild
     restart: on-failure
     deploy:
@@ -322,10 +304,9 @@ services:
       context: ./
       dockerfile: Dockerfile.erc721approvalmonitor
     image: "openrelay/erc721approvalmonitor:${TAG:-latest}"
-    command: ["/erc721approvalmonitor", "${REDIS_HOST:-redis:6379}", "${ETHEREUM_NODE:-http://ethnode:8545}", "queue://erc721approvalblocks", "queue://recordspend", "0x48bacb9266a570d521063ef5dd96e61686dbe788"]
+    command: ["/erc721approvalmonitor", "${REDIS_HOST:-redis:6379}", "${ETHEREUM_NODE:-http://ethnode:8545}", "queue://erc721approvalblocks", "queue://recordspend", "${RELAY_ADDRESS}"]
     depends_on:
       - redis
-      - ethnode
       - corebuild
     restart: on-failure
     deploy:
@@ -337,10 +318,9 @@ services:
       context: ./
       dockerfile: Dockerfile.spendmonitor
     image: "openrelay/spendmonitor:${TAG:-latest}"
-    command: ["/spendmonitor", "${REDIS_HOST:-redis:6379}", "${ETHEREUM_NODE:-http://ethnode:8545}", "queue://spendblocks", "queue://recordspend", "0x48bacb9266a570d521063ef5dd96e61686dbe788"]
+    command: ["/spendmonitor", "${REDIS_HOST:-redis:6379}", "${ETHEREUM_NODE:-http://ethnode:8545}", "queue://spendblocks", "queue://recordspend", "${RELAY_ADDRESS}"]
     depends_on:
       - redis
-      - ethnode
       - corebuild
     restart: on-failure
     deploy:
@@ -357,7 +337,6 @@ services:
       POSTGRES_PASSWORD: password
     depends_on:
       - redis
-      - ethnode
       - corebuild
     restart: on-failure
     deploy:
@@ -376,7 +355,6 @@ services:
       - "8084:8080"
     depends_on:
       - redis
-      - ethnode
       - corebuild
     restart: on-failure
     deploy:
@@ -388,10 +366,9 @@ services:
       context: ./
       dockerfile: Dockerfile.canceluptomonitor
     image: "openrelay/canceluptomonitor:${TAG:-latest}"
-    command: ["/canceluptomonitor", "${REDIS_HOST:-redis:6379}", "${ETHEREUM_NODE:-http://ethnode:8545}", "queue://canceluptoblocks", "queue://recordcancel", "0x48bacb9266a570d521063ef5dd96e61686dbe788"]
+    command: ["/canceluptomonitor", "${REDIS_HOST:-redis:6379}", "${ETHEREUM_NODE:-http://ethnode:8545}", "queue://canceluptoblocks", "queue://recordcancel", "${RELAY_ADDRESS}"]
     depends_on:
       - redis
-      - ethnode
       - corebuild
     restart: on-failure
     deploy:
@@ -403,12 +380,11 @@ services:
       context: ./
       dockerfile: Dockerfile.canceluptofilter
     image: "openrelay/canceluptofilter:${TAG:-latest}"
-    command: ["/canceluptofilter", "${REDIS_HOST:-redis:6379}", "postgres://cancelfilter${POSTGRES_HOST:-postgres}", "env://POSTGRES_PASSWORD", "queue://0x48bacb9266a570d521063ef5dd96e61686dbe788-testrpc=>queue://fillupdate"]
+    command: ["/canceluptofilter", "${REDIS_HOST:-redis:6379}", "postgres://cancelfilter${POSTGRES_HOST:-postgres}", "env://POSTGRES_PASSWORD", "queue://${RELAY_ADDRESS}-testrpc=>queue://fillupdate"]
     environment:
       POSTGRES_PASSWORD: password
     depends_on:
       - redis
-      - ethnode
       - postgres
       - corebuild
     restart: on-failure
@@ -437,7 +413,6 @@ services:
       POSTGRES_PASSWORD: password
     depends_on:
       - redis
-      - ethnode
       - postgres
       - corebuild
     restart: on-failure
@@ -456,7 +431,6 @@ services:
       POSTGRES_PASSWORD: password
     depends_on:
       - redis
-      - ethnode
       - postgres
       - corebuild
     restart: on-failure
@@ -470,7 +444,7 @@ services:
       context: ./
       dockerfile: Dockerfile.queuemonitor
     image: "openrelay/queuemonitor:${TAG:-latest}"
-    command: ["/queuemonitor", "${REDIS_HOST:-redis:6379}", "1", "newblocks-ropsten", "ordersfilled", "pgordersfilled", "newblocks", "released-ropsten", "fundcheck-ropsten", "allowanceblocks", "recheck-ropsten", "fillupdate-ropsten", "indexer", "preindexer", "spendblocks-ropsten", "recordspend", "ordersfilled-ropsten", "delay2-ropsten", "released", "fundcheck", "allowanceblocks-ropsten", "recheck2-ropsten", "fillupdate", "fillblocks-ropsten", "spendblocks", "recheck2", "delay1", "delay2", "ingest", "fillblocks", "pgindexer", "delay1-ropsten", "multisigblocks", "recheck", "canceluptoblocks", "recordcancel", "0x48bacb9266a570d521063ef5dd96e61686dbe788-testrpc"]
+    command: ["/queuemonitor", "${REDIS_HOST:-redis:6379}", "1", "newblocks-ropsten", "ordersfilled", "pgordersfilled", "newblocks", "released-ropsten", "fundcheck-ropsten", "allowanceblocks", "recheck-ropsten", "fillupdate-ropsten", "indexer", "preindexer", "spendblocks-ropsten", "recordspend", "ordersfilled-ropsten", "delay2-ropsten", "released", "fundcheck", "allowanceblocks-ropsten", "recheck2-ropsten", "fillupdate", "fillblocks-ropsten", "spendblocks", "recheck2", "delay1", "delay2", "ingest", "fillblocks", "pgindexer", "delay1-ropsten", "multisigblocks", "recheck", "canceluptoblocks", "recordcancel", "${RELAY_ADDRESS}-testrpc"]
     depends_on:
       - redis
       - corebuild
