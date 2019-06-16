@@ -25,94 +25,12 @@ dockerstop:
 nodesetup:
 	cd js ; npm install
 
-bin/delayrelay: $(BASE) cmd/delayrelay/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/delayrelay cmd/delayrelay/main.go
-
-bin/fundcheckrelay: $(BASE) cmd/fundcheckrelay/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/fundcheckrelay cmd/fundcheckrelay/main.go
-
-bin/getbalance: $(BASE) cmd/getbalance/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/getbalance cmd/getbalance/main.go
 
 bin/ingest: $(BASE) cmd/ingest/main.go
 	cd "$(BASE)" && $(GOSTATIC) -o bin/ingest cmd/ingest/main.go
 
-bin/initialize: $(BASE) cmd/initialize/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/initialize cmd/initialize/main.go
 
-bin/simplerelay: $(BASE) cmd/simplerelay/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/simplerelay cmd/simplerelay/main.go
-
-bin/validateorder: $(BASE) cmd/validateorder/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/validateorder cmd/validateorder/main.go
-
-bin/fillupdate: $(BASE) cmd/fillupdate/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/fillupdate cmd/fillupdate/main.go
-
-bin/indexer: $(BASE) cmd/indexer/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/indexer cmd/indexer/main.go
-
-bin/fillindexer: $(BASE) cmd/fillindexer/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/fillindexer cmd/fillindexer/main.go
-
-bin/blockmonitor: $(BASE) cmd/blockmonitor/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/blockmonitor cmd/blockmonitor/main.go
-
-bin/allowancemonitor: $(BASE) cmd/allowancemonitor/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/allowancemonitor cmd/allowancemonitor/main.go
-
-bin/erc721approvalmonitor: $(BASE) cmd/erc721approvalmonitor/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/erc721approvalmonitor cmd/erc721approvalmonitor/main.go
-
-bin/canceluptomonitor: $(BASE) cmd/canceluptomonitor/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/canceluptomonitor cmd/canceluptomonitor/main.go
-
-bin/canceluptofilter: $(BASE) cmd/canceluptofilter/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/canceluptofilter cmd/canceluptofilter/main.go
-
-bin/canceluptoindexer: $(BASE) cmd/canceluptoindexer/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/canceluptoindexer cmd/canceluptoindexer/main.go
-
-bin/affiliatemonitor: $(BASE) cmd/affiliatemonitor/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/affiliatemonitor cmd/affiliatemonitor/main.go
-
-bin/spendmonitor: $(BASE) cmd/spendmonitor/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/spendmonitor cmd/spendmonitor/main.go
-
-bin/fillmonitor: $(BASE) cmd/fillmonitor/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/fillmonitor cmd/fillmonitor/main.go
-
-bin/multisigmonitor: $(BASE) cmd/multisigmonitor/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/multisigmonitor cmd/multisigmonitor/main.go
-
-bin/spendrecorder: $(BASE) cmd/spendrecorder/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/spendrecorder cmd/spendrecorder/main.go
-
-bin/exchangesplitter: $(BASE) cmd/exchangesplitter/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/exchangesplitter cmd/exchangesplitter/main.go
-
-bin/automigrate: $(BASE) cmd/automigrate/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/automigrate cmd/automigrate/main.go
-
-bin/searchapi: $(BASE) cmd/searchapi/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/searchapi cmd/searchapi/main.go
-
-bin/queuemonitor: $(BASE) cmd/queuemonitor/main.go
-	cd "$(BASE)" && CGO_ENABLED=0 $(GOSTATIC) -o bin/queuemonitor cmd/queuemonitor/main.go
-
-bin/terms: $(BASE) cmd/terms/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/terms cmd/terms/main.go
-
-bin/poolfilter: $(BASE) cmd/poolfilter/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/poolfilter cmd/poolfilter/main.go
-
-bin/metadataindexer: $(BASE) cmd/metadataindexer/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/metadataindexer cmd/metadataindexer/main.go
-
-bin/websockets: $(BASE) cmd/websockets/main.go
-	cd "$(BASE)" && $(GOSTATIC) -o bin/websockets cmd/websockets/main.go
-
-bin: bin/delayrelay bin/fundcheckrelay bin/getbalance bin/ingest bin/initialize bin/simplerelay bin/validateorder bin/fillupdate bin/indexer bin/fillindexer bin/automigrate bin/searchapi bin/exchangesplitter bin/blockmonitor bin/allowancemonitor bin/spendmonitor bin/fillmonitor bin/multisigmonitor bin/spendrecorder bin/queuemonitor bin/canceluptomonitor bin/canceluptofilter bin/canceluptoindexer bin/erc721approvalmonitor bin/affiliatemonitor bin/terms bin/poolfilter bin/metadataindexer bin/websockets
+bin: bin/ingest 
 
 truffleCompile:
 	cd js ; node_modules/.bin/truffle compile
